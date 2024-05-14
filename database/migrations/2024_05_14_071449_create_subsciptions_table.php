@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('amount');
             $table->date('start_on');
             $table->date('end_on');
+            $table->string('payment_method');
+            $table->string('cycle');
+            $table->integer('plan_type');
             $table->integer('reminder');
             $table->timestamps();
         });

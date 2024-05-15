@@ -15,7 +15,7 @@ class DefaultSubscriptionsSeeder extends Seeder
     public function run(): void
     {
         // Supprimer les enregistrements existants dans la table
-        DefaultSubscription::truncate();
+        // DefaultSubscription::truncate();
 
         // Créer les souscriptions par défaut
         $defaultSubscriptions = [

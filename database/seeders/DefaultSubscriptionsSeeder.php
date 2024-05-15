@@ -15,33 +15,33 @@ class DefaultSubscriptionsSeeder extends Seeder
     public function run(): void
     {
         // Supprimer les enregistrements existants dans la table
-        // DefaultSubscription::truncate();
+        DefaultSubscription::truncate();
 
         // Créer les souscriptions par défaut
         $defaultSubscriptions = [
             [
                 'name' => 'Netflix',
-                'logo' => 'images/Netflix.png',
+                'logo' => '/storage/logos/Netflix.png',
             ],
             [
                 'name' => 'Jio Cinema',
-                'logo' => 'images/jio.png',
+                'logo' => '/storage/logos/jio.png',
             ],
             [
                 'name' => 'Spotify',
-                'logo' => 'images/spot.png',
+                'logo' => '/storage/logos/spot.png',
             ],
             [
                 'name' => 'Hotstar',
-                'logo' => 'images/dysney.png',
+                'logo' => '/storage/logos/dysney.png',
             ],
             [
                 'name' => 'Youtube',
-                'logo' => 'images/ytb.png',
+                'logo' => '/storage/logos/ytb.png',
             ],
             [
                 'name' => 'Prime',
-                'logo' => 'images/prime.png',
+                'logo' => '/storage/logos/prime.png',
             ],
             // [
             //     'name' => 'Deezer',
@@ -71,10 +71,10 @@ class DefaultSubscriptionsSeeder extends Seeder
      */
     private function copyLogo(string $logoPath): ?string
     {
-        // $absolutePath = base_path($logoPath);
+        $relativePath = asset($logoPath);
 
         // Récupérer le contenu du fichier de logo
-        $fileContent = file_get_contents($logoPath);
+        $fileContent = file_get_contents(asset($relativePath));
 
         if ($fileContent) {
             // permet de générer un nom de fichier unique pour le logo

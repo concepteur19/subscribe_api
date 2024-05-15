@@ -18,9 +18,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
+        'photo',
+        'phone_number',
     ];
 
     /**
@@ -43,8 +45,20 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // public function posts()
-    // {
-    //     return $this->hasMany(Post::class);
-    // }
+    // calcul du montant total dépensé
+    public function getTotalAmountSpent()
+    {
+        return $this->subscriptions()->sum('amount');
+    }
+
+    // relations
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

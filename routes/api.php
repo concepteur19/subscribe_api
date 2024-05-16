@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ArticleController;
-use App\Http\Controllers\SectionController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,11 +18,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [LoginController::class, 'login']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// mettre ici les routes dont l'utilisateur ne peut avoir accès qu'après s'être connecté
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    // retourner l'utilisateur connecté
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
-
-// Route::get('/articles', [ArticleController::class, 'index']);
-// Route::get('/articles/getOne', [ArticleController::class, 'getOneArticle']);
-// Route::post('/articles/addOne', [ArticleController::class, 'createArticle']);

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('isVerified')->default(true);
             $table->string('phone_number')->nullable();
             $table->rememberToken();
             $table->timestamps();

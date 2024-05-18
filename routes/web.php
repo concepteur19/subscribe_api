@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/home', function () {
+Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/authenticating', function () {
-    return view('authenticating');
-});
+//je veux creer une route pour tester l'authentification
+
+

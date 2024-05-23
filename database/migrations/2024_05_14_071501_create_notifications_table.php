@@ -28,7 +28,7 @@ return new class extends Migration
             $table->text('notification_content');
             $table->timestamps();
         });
-    }
+    } 
 
     /**
      * Reverse the migrations.

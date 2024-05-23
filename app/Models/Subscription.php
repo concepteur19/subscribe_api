@@ -12,7 +12,7 @@ class Subscription extends Model
     protected $table = 'subscriptions';
     protected $fillable = [
         'user_id',
-        'default_subscription_id',
+        'defaultSub_id',
         'service_name',
         'logo',
         'amount',

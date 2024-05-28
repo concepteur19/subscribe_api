@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
-    // Create subscription
+    // Create subscription OK
     public function addSubscription(SubscriptionRequest $request)
     {
 
@@ -41,9 +41,9 @@ class SubscriptionController extends Controller
                 $subscription->service_name = $defaultSubscription->name;
                 $subscription->logo = $defaultSubscription->logo;
             } else {
-                $subscription->service_name = $request->name;
-                $subscription->logo = $request->logo;
-                $subscription->$plan_type = $planTypeParam;
+                $subscription->service_name = $request->service_name;
+                // $subscription->logo = $request->logo;
+                // $subscription->$plan_type = $planTypeParam;
                 $subscription->amount = $request->amount;
             }
 
@@ -92,12 +92,22 @@ class SubscriptionController extends Controller
             $notification->user_id = $request->user_id;
             $notification->subscription_id = $subscription->id;
             $notification->notification_channel = 'email';
-            $notification->sent_at = $endOn->copy()->subDays($request->reminder);
+            $notification->sent_at = $this->sentAt($endOn, $request->reminder);
             $notification->notification_status = 'pending';
             $notification->notification_content = $notificationContent;
 
             // Enregistrer la notification
             $notification->save();
+
+            $push = new Notification();
+            $push->user_id = $request->user_id;
+            $push->subscription_id = $subscription->id;
+            $push->sent_at = $this->sentAt($endOn, $request->reminder);
+            $push->notification_channel = 'push';
+            $push->notification_status = 'false';
+            $push->notification_content = '';
+
+            $push->save();
 
             return response()->json([
                 'status' => true,
@@ -111,15 +121,15 @@ class SubscriptionController extends Controller
         }
     }
 
-    // Read all the subscriptions
+    // Read all the subscriptions OK
     public function getSubscriptions()
     {
         try {
             $subscriptions = Subscription::all();
             return response()->json([
-                'code' => 201,
+                'code' => 200,
                 'status' => true,
-                'subscriptions' => $subscriptions
+                'Subscription[]' => $subscriptions
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -129,7 +139,7 @@ class SubscriptionController extends Controller
         }
     }
 
-    // Read all subscriptions of the user
+    // Read all subscriptions of the user OK
     public function getUserSubscriptions(User $user)
     {
 
@@ -159,7 +169,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'subscriptions' => $subscriptionsData
+                'Subscription[]' => $subscriptionsData
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -169,7 +179,7 @@ class SubscriptionController extends Controller
         }
     }
 
-    // get one subscription
+    // get one subscription OK
     public function getOneSubscription(Subscription $subscription)
     {
         try {
@@ -190,7 +200,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'subscription' => $subscriptionMap
+                'Subscription' => $subscriptionMap
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -200,7 +210,7 @@ class SubscriptionController extends Controller
         }
     }
 
-    // update a subscription
+    // update a subscription OK
     public function editSubscription(Subscription $subscription, Request $request)
     {
         try {
@@ -214,7 +224,8 @@ class SubscriptionController extends Controller
             $notification = $subscription->notifications->first();
             if ($notification) {
                 // Mettre à jour le champ sent_at en fonction du rappel
-                $notification->sent_at = $endOn->copy()->subDays($request->reminder);
+                $notification->sent_at = $this->sentAt($endOn, $request->reminder);
+                // $endOn->copy()->subDays($request->reminder);
 
                 // Définir le statut de la notification à 'pending' si l'heure de notification est dans le futur
                 if (Carbon::now()->lt($notification->sent_at)) {
@@ -241,7 +252,7 @@ class SubscriptionController extends Controller
         }
     }
 
-    //  delete a subscription
+    //  delete a subscription  OK
     public function deleteOneSubscription(Subscription $subscription)
     {
         try {
@@ -260,12 +271,16 @@ class SubscriptionController extends Controller
         }
     }
 
-    //  delete all user's subscription
-    public function deleteAllUserSubscriptions(User $user) {
-        return response()->json([]);
+    //  delete all user's subscription ok
+    public function deleteAllUserSubscriptions(User $user)
+    {
+        // return response()->json([]);
 
         try {
-            $user->subscriptions->delete();
+            $user->subscriptions->each(function ($subscription) {
+                $subscription->delete();
+            });
+            $user->save();
             return response()->json([
                 'code' => 200,
                 'status' => true,
@@ -278,5 +293,60 @@ class SubscriptionController extends Controller
                 'message' => $th->getMessage()
             ], 500);
         }
+    }
+
+    // get expired subscription OK
+    public function getExpSubscriptions(User $user)
+    {
+        $expSubscriptions = [];
+
+        try {
+            $notifications = Notification::all()
+                ->where('user_id', $user->id)
+                ->where('notification_channel', 'push')
+                ->where('notification_status', 'false')
+                ->where('sent_at', '<=', Carbon::now());
+
+            foreach ($notifications as $push) {
+                $expSubscriptions[] = $push->subscription;
+            }
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'Subscription[]' => $expSubscriptions
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500,
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    // get default description ok
+    public function getDefaultSubscriptions()
+    {
+        $defaultDescription = DefaultSubscription::all();
+        try {
+            
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'Subscription[]' => $defaultDescription
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500,
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    // 
+    private function sentAt($endOn, $reminder)
+    {
+        return $endOn->copy()->subDays($reminder);
     }
 }

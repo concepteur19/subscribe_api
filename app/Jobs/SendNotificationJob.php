@@ -30,24 +30,29 @@ class SendNotificationJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $notifications = Notification::where('notification_status', 'pending')
+        // notifications push et email arrivées à expiration
+        $notifications = Notification::whereIn('notification_status', ['pending', 'false'])
             // ->whereDate('sent_at', Carbon::now()->toDateString())
             ->where('sent_at', '<=', Carbon::now())
             ->get();
 
         foreach ($notifications as $notification) {
             try {
-                // envoie du mail
-                Mail::raw($notification->notification_content, function ($message) use ($notification) {
-                    $message->to($notification->user->email)
-                        ->subject('Subscription Reminder');
-                });
+                if ($notification->notification_status === 'pending') {
+                    // envoie du mail
+                    Mail::raw($notification->notification_content, function ($message) use ($notification) {
+                        $message->to($notification->user->email)
+                            ->subject('Subscription Reminder');
+                    });
 
-                //  mise à jour du statut de la notif après l'envois du mail
-                $notification->notification_status = 'sent';
-                $notification->save();
+                    //  mise à jour du statut de la notif après l'envois du mail
+                    $notification->notification_status = 'sent';
+                    $notification->save();
+                } else {
+                    $notification->notification_status = 'true';
+                    $notification->save();
+                }
             } catch (\Exception $e) {
-                // Gestio de l'erreur (par exemple, journaliser l'erreur)
                 Log::error('Error sending notification email: ' . $e->getMessage());
             }
         }

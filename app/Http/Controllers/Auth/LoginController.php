@@ -11,7 +11,6 @@ class LoginController extends Controller
 {
     public function login(LogUserRequest $request)
     {
-
         try {
 
             if (Auth::attempt($request->only(['email', 'password']))) {
@@ -24,7 +23,7 @@ class LoginController extends Controller
                     'status' => true,
                     'message' => 'Utilisateur connecté.',
 
-                    'user' => [
+                    'User' => [
                         'id' => $user->id,
                         'username' => $user->username,
                         'email' => $user->email,
@@ -34,6 +33,7 @@ class LoginController extends Controller
             } else {
                 return response()->json([
                     'code' => 403,
+                    'status' => false,
                     'message' => 'Informations non valides.'
                 ]);
             }

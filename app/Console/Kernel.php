@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->job(new SendNotificationJob)->daily();
+        $schedule->job(new SendNotificationJob)->daily()->at('11:07');
         // ->at('07:35');
         // ->everyMinute();
         // ->evenInMaintenanceMode()->runInBackground();

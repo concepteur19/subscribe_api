@@ -23,7 +23,7 @@ class RegisterController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Utilisateur enregistré avec succès!!!',
-                'User' => $user
+                'data' => $user
             ]);
         } catch (Exception $e) {
             return response()->json($e);

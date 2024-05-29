@@ -32,7 +32,7 @@ class UserController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Utilisateur modifié avec succès!!!',
-                'User' => $user
+                'data' => $user
             ]);
         } catch (Exception $e) {
             return response()->json($e);

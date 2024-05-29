@@ -42,7 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/subscriptions/expired/{user}', [SubscriptionController::class, 'getExpSubscriptions']); //ui ok
 
     // récupérer toutes les souscriptions par défaut
-    Route::post('/subscriptions/default_subscriptions', [SubscriptionController::class, 'getDefaultSubscriptions']); //ui ok
+    Route::post('/subscriptions/defaultSubscriptions', [SubscriptionController::class, 'getDefaultSubscriptions']); //ui ok
 
     // Modification du statut d'une notif push OK
     Route::put('/subscriptions/notificationUpdate/{user}', [NotificationController::class, 'updateNotification']); //ui ok

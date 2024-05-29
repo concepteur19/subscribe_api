@@ -129,7 +129,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'Subscription[]' => $subscriptions
+                'data' => $subscriptions
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -169,7 +169,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'Subscription[]' => $subscriptionsData
+                'data' => $subscriptionsData
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -200,7 +200,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'Subscription' => $subscriptionMap
+                'data' => $subscriptionMap
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -313,7 +313,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'Subscription[]' => $expSubscriptions
+                'data' => $expSubscriptions
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -333,7 +333,7 @@ class SubscriptionController extends Controller
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'Subscription[]' => $defaultDescription
+                'data' => $defaultDescription
             ]);
         } catch (\Throwable $th) {
             return response()->json([

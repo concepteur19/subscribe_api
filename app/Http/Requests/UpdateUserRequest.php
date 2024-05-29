@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RegisterUser extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,28 +24,30 @@ class RegisterUser extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required',
-            'email' => 'required|unique:users,email',
-            'password' => 'required'
+            'username' => 'sometimes|required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
+            'phone_number' => 'sometimes|required|string|max:15',
         ];
     }
 
     public function failedValidation(Validator $validator) {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'status_code' => 422,
+            'status_code' => 400,
             'message' => 'Erreur de validation',
             'errorsList' => $validator->errors()
         ]));
     }
 
-    public function messages()
-    {
-        return[
-            'username.required' => "Un nom d'utilisateur doit être foutni",
-            'email.required' => "Une addresse mail doit etre fournie",
-            'email.unique' => ' Cette addresse mail existe déjà',
-            'password.required' => 'Le mot de passe est requis'
-        ];
-    }
+    // public function messages()
+    // {
+    //     return[
+    //         'user_id.required' => "Identifiant de l'utilisateur requis",
+    //         'start_on.date' => "La date n'est pas au bon format JJ-MM-AAAA",
+    //         'defaultSub_id.required' => "Souscription par défaut requise",
+    //         // 'email.unique' => ' Cette addresse mail existe déjà',
+    //         // 'password.required' => 'Le mot de passe est requis'
+
+    //     ];
+    // }
 }

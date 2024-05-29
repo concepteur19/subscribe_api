@@ -23,7 +23,12 @@ class LoginController extends Controller
                     'code' => 200,
                     'status' => true,
                     'message' => 'Utilisateur connecté.',
+<<<<<<< HEAD
                     'user' => [
+=======
+
+                    'User' => [
+>>>>>>> 04fe596256ef30885a323c289b89ddd14da6ab7e
                         'id' => $user->id,
                         'username' => $user->username,
                         'email' => $user->email,

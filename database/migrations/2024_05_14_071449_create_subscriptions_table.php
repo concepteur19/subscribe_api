@@ -29,7 +29,7 @@ return new class extends Migration
             $table->date('end_on');
             $table->string('payment_method')->nullable();
             $table->string('cycle');
-            $table->integer('plan_type')->nullable();
+            $table->string('plan_type');
             $table->integer('reminder');
             $table->timestamps();
         });

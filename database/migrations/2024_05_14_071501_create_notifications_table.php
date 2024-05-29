@@ -21,6 +21,7 @@ return new class extends Migration
             // relation avec la souscription
             $table->unsignedBigInteger('subscription_id')->nullable();
             $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('set null');
+            // $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('cascade');
 
             $table->string('notification_channel');
             $table->timestamp('sent_at');
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->text('notification_content');
             $table->timestamps();
         });
-    }
+    } 
 
     /**
      * Reverse the migrations.

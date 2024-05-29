@@ -2,71 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LogUserRequest;
-use App\Http\Requests\RegisterUser;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function register(RegisterUser $request)
+    public function editUser(User $user, UpdateUserRequest $request)
     {
-
         try {
-            $user = new User;
-            $user->username = $request->username;
-            $user->email = $request->email;
-            $user->password = $request->password;
+            /** @var UploadedFile|null $photo */
+            $photo = $request->file('image');
 
-            $user->save();
+            if ($photo !== null && !$photo->getError()) {
+                if ($user->photo) {
+                    Storage::disk('public')->delete($user->photo);
+                }
+                $photoPath = $photo->store("userPhoto/id_{$user->id}", "public");
+                $user->photo = $photoPath;
+            }
+
+            $user->username = $request->input('username', $user->username);
+            $user->phone_number = $request->input('phone_number', $user->phone_number);
+    
+            $user->save(); 
 
             return response()->json([
                 'code' => 200,
-                'message' => 'Utilisateur enregistré avec succès!!!',
-                'user' => $user
+                'message' => 'Utilisateur modifié avec succès!!!',
+                'User' => $user
             ]);
         } catch (Exception $e) {
             return response()->json($e);
         }
     }
-
-    // public function login(LogUserRequest $request)
-    // {
-
-    //     try {
-
-    //         if (Auth::attempt($request->only(['email', 'password']))) {
-
-    //             $user = User::where('email', $request->email)->first();
-    //             $token = $user->createToken("LA_CLE_SECRETE_DE_CONCEPTEUR_JS")->plainTextToken;
-
-    //             return response()->json([
-    //                 'code' => 200,
-    //                 'status' => true,
-    //                 'message' => 'Utilisateur connecté.',
-
-    //                 'user' => [
-    //                     'id' => $user->id,
-    //                     'username' => $user->username,
-    //                     'email' => $user->email,
-    //                     'token' => $token
-    //                 ]
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'code' => 403,
-    //                 'message' => 'Informations non valides.'
-    //             ]);
-    //         }
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => $th->getMessage()
-    //         ], 500);
-    //     }
-    // }
 
     // public function forgotPassword(Request $request)
     // {
@@ -101,33 +72,6 @@ class UserController extends Controller
     //                 'message' => "Incorrect code",
     //             ], 400);
     //         }
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => $th->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
-
-    // public function resendCode(Request $request)
-    // {
-    //     try {
-    //         $user = User::all()->where('id', $request->id)->first();
-    //         $message = "You want to reset your password your verification code is : $user->reset_password_code";
-    //         $account_sid = getenv("TWILIO_SID");
-    //         $auth_token = getenv("TWILIO_TOKEN");
-    //         $twilio_number = getenv("TWILIO_FROM");
-    //         $client = new Twillio($account_sid, $auth_token);
-    //         $client->messages->create($user->numero, [
-    //             'from' => $twilio_number,
-    //             'body' => $message
-    //         ]);
-
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => "Code renvoyé avec succès",
-    //         ], 200);
     //     } catch (\Throwable $th) {
     //         return response()->json([
     //             'status' => false,

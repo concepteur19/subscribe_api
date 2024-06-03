@@ -28,6 +28,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Modification des informations de l'utilisateur
     Route::post('/users/edit/{user}', [UserController::class, 'editUser']);
+    // retourner l'utilisateur connecté 
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
     // CRUD sur les souscriptions
     Route::post('/subscriptions/add', [SubscriptionController::class, 'addSubscription']); // ui ok
@@ -43,14 +47,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // récupérer toutes les souscriptions par défaut
     Route::post('/subscriptions/defaultSubscriptions', [SubscriptionController::class, 'getDefaultSubscriptions']); //ui ok
+    // récupérer une souscription par défaut
+    Route::get('/subscriptions/defaultSubscriptions/{defaultSubscription}', [SubscriptionController::class, 'getOneDefaultSubscription']);
 
     // Modification du statut d'une notif push OK
     Route::put('/subscriptions/notificationUpdate/{user}', [NotificationController::class, 'updateNotification']); //ui ok
 
     // Route::get('/sendEmail', [SendNotificationJob::class, 'handle']);
-
-    // retourner l'utilisateur connecté 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    
 });

@@ -192,6 +192,7 @@ class SubscriptionController extends Controller
                 'plan_type' => $type ? $subscription->plan_type : null,
                 'reminder' => $subscription->reminder,
                 'amount' => $subscription->amount,
+                'payment_method' => $subscription->payment_method,
                 'type' => $type ? $type->type : $subscription->plan_type,
                 'start_on' => $subscription->start_on,
                 'end_on' => $subscription->end_on,
@@ -327,13 +328,40 @@ class SubscriptionController extends Controller
     // get default description ok
     public function getDefaultSubscriptions()
     {
-        $defaultDescription = DefaultSubscription::all();
+        $defaultSubscriptions = DefaultSubscription::all();
         try {
             
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'data' => $defaultDescription
+                'data' => $defaultSubscriptions
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500,
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    // 
+    public function getOneDefaultSubscription(DefaultSubscription $defaultSubscription) {
+        try {
+            
+            // $planTypes = PlanType::where('default_subscription_id', $defaultSubscription->id);
+            // $defaultSubscriptionMap = $defaultSubscription;
+            // $defaultSubscription->planTypes = $planTypes;
+
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'data' => [
+                    'id'=> $defaultSubscription->id,
+                    'name'=> $defaultSubscription->name,
+                    'logo'=> $defaultSubscription->logo,
+                    'planTypes'=>$defaultSubscription->planTypes
+                ]
             ]);
         } catch (\Throwable $th) {
             return response()->json([

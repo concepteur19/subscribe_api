@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [RegisterController::class, 'register']); //int ok
-Route::post('/login', [LoginController::class, 'login']); //int ok
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [LoginController::class, 'login']);
 
 // mettre ici les routes dont l'utilisateur ne peut avoir accès qu'après s'être connecté
 Route::middleware(['auth:sanctum'])->group(function () {

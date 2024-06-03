@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LogUserRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -40,6 +41,24 @@ class LoginController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        try {
+            // Revoque le token actuel
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully logged out'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false, 
                 'message' => $th->getMessage()
             ], 500);
         }

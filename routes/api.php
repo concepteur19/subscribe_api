@@ -54,5 +54,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/subscriptions/notificationUpdate/{user}', [NotificationController::class, 'updateNotification']); //ui ok
 
     // Route::get('/sendEmail', [SendNotificationJob::class, 'handle']);
+
+    Route::post('/logout', [LoginController::class, 'logout']);
     
 });

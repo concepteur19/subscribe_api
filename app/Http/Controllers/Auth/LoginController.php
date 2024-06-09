@@ -27,6 +27,8 @@ class LoginController extends Controller
                     'data' => [
                         'id' => $user->id,
                         'username' => $user->username,
+                        'photo' => $user->photo,
+                        'phone_number' => $user->phone_number,
                         'email' => $user->email,
                         'token' => $token
                     ]

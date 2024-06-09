@@ -25,7 +25,7 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'username' => 'sometimes|required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:4096',
             'phone_number' => 'sometimes|required|string|max:15',
         ];
     }

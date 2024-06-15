@@ -20,8 +20,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [UserController::class, 'register']);
+Route::post('/googleRegister', [RegisterController::class, 'googleRegistration']);
+Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
+
+Route::get('auth/google', [RegisterController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [RegisterController::class, 'handleGoogleCallback']);
 
 // mettre ici les routes dont l'utilisateur ne peut avoir accès qu'après s'être connecté
 Route::middleware(['auth:sanctum'])->group(function () {

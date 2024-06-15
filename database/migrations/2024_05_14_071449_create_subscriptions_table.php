@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('defaultSub_id')->references('id')->on('default_subscriptions')->onDelete('set null');
             
             $table->string('service_name');
-            $table->string('logo');
+            $table->string('logo')->nullable();;
             $table->decimal('amount');
             $table->date('start_on');
             $table->date('end_on');

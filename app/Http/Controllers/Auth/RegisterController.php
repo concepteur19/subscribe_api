@@ -6,9 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterUser;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Laravel\Socialite\Facades\Socialite; // Import de Socialite
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Exception;
 
@@ -77,39 +74,4 @@ class RegisterController extends Controller
             return response()->json($e);
         }
     }
-
-    // public function redirectToGoogle()
-    // {
-    //     return Socialite::driver('google')->redirect();
-    // }
-
-    // public function handleGoogleCallback()
-    // {
-    //     $user = Socialite::driver('google')->user();
-
-    //     $existingUser = User::where('email', $user->getEmail())->first();
-
-    //     if ($existingUser) {
-    //         Auth::login($existingUser);
-    //     } else {
-
-    //         $randomPassword = Str::random(12);
-
-    //         $newUser = User::create([
-    //             'username' => $user->getName(),
-    //             'email' => $user->getEmail(),
-    //             'password' => Hash::make($randomPassword),
-    //             // 'google_id' => $user->getId(),
-    //         ]);
-
-    //         Auth::login($newUser);
-    //     }
-
-    //     // return redirect()->intended('/home');
-    //     return response()->json([
-    //         'code' => 200,
-    //         'message' => 'Utilisateur enregistré avec succès!!!',
-    //         'data' => $newUser
-    //     ]);
-    // }
 }

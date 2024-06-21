@@ -33,45 +33,45 @@ class RegisterController extends Controller
         }
     }
 
-    public function googleRegistration(Request $request)
+    public function googleAuth(Request $request)
     {
         try {
             $user_ = User::where('email', $request->email)->first();
 
             if ($user_) {
-                // Auth::login($user_);
-                $token = $user_->createToken('Google OAuth Token')->plainTextToken;
-                return response()->json([
-                    'code' => 200,
-                    'status' => true,
-                    'message' => 'Utilisateur connecté.',
-
-                    'data' => [
-                        'id' => $user_->id,
-                        'username' => $user_->username,
-                        'photo' => $user_->photo,
-                        'phone_number' => $user_->phone_number,
-                        'email' => $user_->email,
-                        'token' => $token
-                    ]
-                ]);
+                return $this->login($user_);
             } else {
                 $randomPassword = Str::random(12);
                 $user = new User();
                 $user->username = $request->username;
                 $user->email = $request->email;
+                $user->photo = $request->photo;
                 $user->password = $randomPassword;
                 $user->save();
 
-                return response()->json([
-                    'code' => 200,
-                    'message' => 'Utilisateur enregistré avec succès!!!',
-                    'data' => $user,
-
-                ]);
+                return $this->login($user);
             }
         } catch (Exception $e) {
             return response()->json($e);
         }
+    }
+
+    private function login($user)
+    {
+        $token = $user->createToken('Google OAuth Token')->plainTextToken;
+        return response()->json([
+            'code' => 200,
+            'status' => true,
+            'message' => 'Utilisateur connecté.',
+
+            'data' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'photo' => $user->photo,
+                'phone_number' => $user->phone_number,
+                'email' => $user->email,
+                'token' => $token
+            ]
+        ]);
     }
 }

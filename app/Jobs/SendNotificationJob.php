@@ -28,17 +28,16 @@ class SendNotificationJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle()
     {
         // notifications push et email arrivées à expiration
-        $notifications = Notification::whereIn('notification_status', ['pending', 'false'])
-            // ->whereDate('sent_at', Carbon::now()->toDateString())
+        $notifications = Notification::where('notification_status', 'pending')
             ->where('sent_at', '<=', Carbon::now())
             ->get();
 
         foreach ($notifications as $notification) {
             try {
-                if ($notification->notification_status === 'pending') {
+                if ($notification->notification_channel === 'email') {
                     // envoie du mail
                     Mail::raw($notification->notification_content, function ($message) use ($notification) {
                         $message->to($notification->user->email)
@@ -52,9 +51,18 @@ class SendNotificationJob implements ShouldQueue
                     $notification->notification_status = 'true';
                     $notification->save();
                 }
+
+                
             } catch (\Exception $e) {
                 Log::error('Error sending notification email: ' . $e->getMessage());
             }
+
         }
+
+        // return response()->json([
+        //     'code' => 201,
+        //     'status' => true,
+        //     'data' => $notifications
+        // ]);
     }
 }

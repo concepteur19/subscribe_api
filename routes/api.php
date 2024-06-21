@@ -20,12 +20,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/googleRegister', [RegisterController::class, 'googleRegistration']);
+Route::post('/googleRegister', [RegisterController::class, 'googleAuth']);
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
-
-Route::get('auth/google', [RegisterController::class, 'redirectToGoogle']);
-Route::get('auth/google/callback', [RegisterController::class, 'handleGoogleCallback']);
 
 // mettre ici les routes dont l'utilisateur ne peut avoir accès qu'après s'être connecté
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -55,9 +52,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/subscriptions/defaultSubscriptions/{defaultSubscription}', [SubscriptionController::class, 'getOneDefaultSubscription']);
 
     // Modification du statut d'une notif push OK
-    Route::put('/subscriptions/notificationUpdate/{user}', [NotificationController::class, 'updateNotification']); //ui ok
+    Route::put('/subscriptions/notificationUpdate/{notification}', [NotificationController::class, 'updateNotification']); //ui ok
 
-    // Route::get('/sendEmail', [SendNotificationJob::class, 'handle']);
+    // récupérer les notifications
+    Route::get('/user/notifications/{user}', [NotificationController::class, 'getUserNotifications']); //
+
+
+    Route::get('/sendEmail', [SendNotificationJob::class, 'handle']);
 
     Route::post('/logout', [LoginController::class, 'logout']);
     

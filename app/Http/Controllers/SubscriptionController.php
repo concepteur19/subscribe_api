@@ -56,7 +56,7 @@ class SubscriptionController extends Controller
 
 
             // Converti start_on en instance de Carbon
-            $startOn = Carbon::parse($request->start_on);
+            $startOn = Carbon::parse($request->start_on)->copy()->addDay();
             $subscription->start_on = $startOn;
             // dd($startOn);
 
@@ -104,14 +104,14 @@ class SubscriptionController extends Controller
             $push->subscription_id = $subscription->id;
             $push->sent_at = $this->sentAt($endOn, $request->reminder);
             $push->notification_channel = 'push';
-            $push->notification_status = 'false';
+            $push->notification_status = 'pending'; //'false';
             $push->notification_content = '';
 
             $push->save();
 
             return response()->json([
                 'status' => true,
-                'message' => 'Subscription and notification created successfully'
+                'message' => 'Subscription and notifications created successfully'
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
@@ -166,10 +166,48 @@ class SubscriptionController extends Controller
                 ];
             });
 
+            $notifications = Notification::where('user_id', $user->id)
+                ->where('notification_channel', 'push')
+                ->whereHas('subscription')
+                ->with('subscription')
+                ->get();
+
+            // dd($notifications);
+
+            $notificationsWithSubscriptions = $notifications->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'notification_status' => $notification->notification_status,
+                    'notif_date' => $notification->sent_at,
+                    'amount' => $notification->subscription->amount,
+                    'end_on' => $notification->subscription->end_on,
+                    'reminder' => $notification->subscription->reminder,
+                    'logo' => $notification->subscription->logo,
+                    'service_name' => $notification->subscription->service_name
+
+                ];
+            });
+
+            // 
+            $trueNotifications = $notificationsWithSubscriptions->filter(function ($notification) {
+                return $notification['notification_status'] === 'true';
+            })->values()->toArray();
+
+            // Calculer la somme des montants pour les notifications approuvées
+            $approvedAmountSum = $notificationsWithSubscriptions->filter(function ($notification) {
+                return $notification['notification_status'] === 'approuved';
+            })->sum('amount');
+
+
             return response()->json([
                 'code' => 200,
                 'status' => true,
-                'data' => $subscriptionsData
+                'data' => [
+                    'subscriptions' => $subscriptionsData,
+                    'payments' => $notificationsWithSubscriptions,
+                    'notificationsToPush' => $trueNotifications,
+                    'totalAmount' => $approvedAmountSum
+                ]
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -330,7 +368,7 @@ class SubscriptionController extends Controller
     {
         $defaultSubscriptions = DefaultSubscription::all();
         try {
-            
+
             return response()->json([
                 'code' => 200,
                 'status' => true,
@@ -346,9 +384,10 @@ class SubscriptionController extends Controller
     }
 
     // 
-    public function getOneDefaultSubscription(DefaultSubscription $defaultSubscription) {
+    public function getOneDefaultSubscription(DefaultSubscription $defaultSubscription)
+    {
         try {
-            
+
             // $planTypes = PlanType::where('default_subscription_id', $defaultSubscription->id);
             // $defaultSubscriptionMap = $defaultSubscription;
             // $defaultSubscription->planTypes = $planTypes;
@@ -357,10 +396,10 @@ class SubscriptionController extends Controller
                 'code' => 200,
                 'status' => true,
                 'data' => [
-                    'id'=> $defaultSubscription->id,
-                    'name'=> $defaultSubscription->name,
-                    'logo'=> $defaultSubscription->logo,
-                    'planTypes'=>$defaultSubscription->planTypes
+                    'id' => $defaultSubscription->id,
+                    'name' => $defaultSubscription->name,
+                    'logo' => $defaultSubscription->logo,
+                    'planTypes' => $defaultSubscription->planTypes
                 ]
             ]);
         } catch (\Throwable $th) {

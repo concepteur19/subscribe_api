@@ -102,7 +102,7 @@ class SubscriptionController extends Controller
             $push = new Notification();
             $push->user_id = $request->user_id;
             $push->subscription_id = $subscription->id;
-            $push->sent_at = $this->sentAt($endOn, $request->reminder);
+            $push->sent_at = $endOn; //$this->sentAt($endOn, $request->reminder);
             $push->notification_channel = 'push';
             $push->notification_status = 'pending'; //'false';
             $push->notification_content = '';

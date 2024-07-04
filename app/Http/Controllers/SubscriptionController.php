@@ -224,6 +224,7 @@ class SubscriptionController extends Controller
             $type = PlanType::where("id", (int) $subscription->plan_type)->select('type')->first();
             $subscriptionMap = [
                 'id' => $subscription->id,
+                'defaultSub_id' => $subscription->defaultSub_id,
                 'service_name' => $subscription->service_name,
                 'logo' => $subscription->logo,
                 'cycle' => $subscription->cycle,
@@ -249,47 +250,97 @@ class SubscriptionController extends Controller
         }
     }
 
-    // update a subscription OK
     public function editSubscription(Subscription $subscription, Request $request)
-    {
-        try {
-            // Mettre à jour le rappel de l'abonnement
+{
+    try {
+        // Find the plan type if provided
+        $planTypeParam = $request->plan_type;
+        $plan_type = $planTypeParam ? PlanType::find($planTypeParam) : null;
+
+        // Update amount based on plan type
+        if ($plan_type && ($plan_type->id !== $planTypeParam)) {
+            $subscription->amount = $plan_type->amount;
+        } else {
+            if ($request->has('service_name')) {
+                $subscription->service_name = $request->service_name;
+            }
+            if ($request->has('amount')) {
+                $subscription->amount = $request->amount;
+            }
+        }
+
+        // Update subscription details based on request parameters
+        if ($planTypeParam) {
+            $subscription->plan_type = $planTypeParam;
+        }
+        if ($request->has('payment_method')) {
+            $subscription->payment_method = $request->payment_method;
+        }
+        if ($request->has('cycle')) {
+            $subscription->cycle = $request->cycle;
+        }
+        if ($request->has('reminder')) {
             $subscription->reminder = $request->reminder;
+        }
 
-            // Obtenir la date de fin de l'abonnement
-            $endOn = Carbon::parse($subscription->end_on);
+        // Update start date and calculate end date based on the cycle
+        if ($request->has('start_on')) {
+            $startOn = Carbon::parse($request->start_on)->copy()->addDay();
+            $subscription->start_on = $startOn;
 
-            // Obtenir la première notification
-            $notification = $subscription->notifications->first();
+            switch ($subscription->cycle) {
+                case 'monthly':
+                    $endOn = $startOn->copy()->addMonth();
+                    break;
+                case 'yearly':
+                    $endOn = $startOn->copy()->addYear();
+                    break;
+                case 'semesterly':
+                    $endOn = $startOn->copy()->addMonths(6);
+                    break;
+                default:
+                    throw new \InvalidArgumentException('Invalid subscription cycle.');
+            }
+            $subscription->end_on = $endOn->toDateString();
+        }
+
+        $subscription->save();
+
+        // Update notifications related to the subscription
+        $notifications = $subscription->notifications;
+
+        foreach ($notifications as $notification) {
             if ($notification) {
-                // Mettre à jour le champ sent_at en fonction du rappel
-                $notification->sent_at = $this->sentAt($endOn, $request->reminder);
-                // $endOn->copy()->subDays($request->reminder);
+                $user = $notification->user;
+                $endOnMail = Carbon::parse($subscription->end_on)->toFormattedDateString();
 
-                // Définir le statut de la notification à 'pending' si l'heure de notification est dans le futur
+                $notification->notification_content = "Hello {$user->username}, your subscription to {$subscription->service_name} will expire on {$endOnMail}. The renewal amount is {$subscription->amount}\$. Please visit our application for more details: https://Subscribe.com";
+
+                $notification->sent_at = $this->sentAt($endOn, $subscription->reminder);
+
                 if (Carbon::now()->lt($notification->sent_at)) {
                     $notification->notification_status = 'pending';
                 }
 
-                // Sauvegarder les modifications de la notification
+                // Save the notification changes
                 $notification->save();
             }
-
-            // Sauvegarder les modifications de l'abonnement
-            $subscription->save();
-            return response()->json([
-                'code' => 201,
-                'status' => true,
-                'message' => 'Subscription updated succefully.'
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'code' => 500,
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
         }
+
+        return response()->json([
+            'code' => 201,
+            'status' => true,
+            'message' => 'Subscription updated successfully.'
+        ]);
+    } catch (\Throwable $th) {
+        return response()->json([
+            'code' => 500,
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
     }
+}
+
 
     //  delete a subscription  OK
     public function deleteOneSubscription(Subscription $subscription)

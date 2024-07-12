@@ -52,7 +52,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/subscriptions/defaultSubscriptions/{defaultSubscription}', [SubscriptionController::class, 'getOneDefaultSubscription']);
 
     // Modification du statut d'une notif push OK
-    Route::put('/subscriptions/notificationUpdate/{notification}', [NotificationController::class, 'updateNotification']); //ui ok
+    Route::put('/subscriptions/notificationUpdate/{notification}', [NotificationController::class, 'updateNotification']); //ui ok /subscriptions/notifications/Update
+    Route::post('/subscriptions/notifications/Update', [NotificationController::class, 'updateNotifications']); //ui ok 
 
     // récupérer les notifications
     Route::get('/user/notifications/{user}', [NotificationController::class, 'getUserNotifications']); //

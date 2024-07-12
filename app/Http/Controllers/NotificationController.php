@@ -87,4 +87,34 @@ class NotificationController extends Controller
             ], 500);
         }
     }
+
+    public function updateNotifications(Request $request)
+{
+    $idsApprouve = $request->input('idsApprouve', []);
+    $idsReject = $request->input('idsReject', []);
+
+    if (!empty($idsApprouve)) {
+        $this->updateNotificationStatus($idsApprouve, 'approuved');
+    }
+
+    if (!empty($idsReject)) {
+        $this->updateNotificationStatus($idsReject, 'rejected');
+    }
+
+    return response()->json([
+        'code' => 201,
+        'status' => true,
+        'message' => "Notifications mises à jour avec succès"
+    ]);
+}
+
+private function updateNotificationStatus(array $ids, string $status)
+{
+    try {
+        Notification::whereIn('id', $ids)->update(['notification_status' => $status]);
+    } catch (\Throwable $th) {
+        throw new \Exception("Erreur lors de la mise à jour des notifications : " . $th->getMessage());
+    }
+}
+
 }

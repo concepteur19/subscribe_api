@@ -28,7 +28,8 @@ class SubscriptionController extends Controller
             $defaultSub_id = $request->defaultSub_id;
 
             $planTypeParam = $request->plan_type;
-            $plan_type = PlanType::find($planTypeParam);
+            $planTypeParamInt = (int) $planTypeParam;
+            $plan_type = PlanType::find($planTypeParamInt);
             // dd($plan_type);
 
             if ($defaultSub_id && $plan_type) {
@@ -255,7 +256,8 @@ class SubscriptionController extends Controller
     try {
         // Find the plan type if provided
         $planTypeParam = $request->plan_type;
-        $plan_type = $planTypeParam ? PlanType::find($planTypeParam) : null;
+        $planTypeParamInt = (int) $planTypeParam;
+        $plan_type = PlanType::find($planTypeParamInt);
 
         // Update amount based on plan type
         if ($plan_type && ($plan_type->id !== $planTypeParam)) {

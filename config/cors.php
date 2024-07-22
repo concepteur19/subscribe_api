@@ -21,6 +21,8 @@ return [
 
     'allowed_origins' => ['*'],
 
+    // 'allowed_origins' => ['https://subscribe-ui.vercel.app/ '],
+
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],

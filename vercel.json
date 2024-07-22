@@ -3,7 +3,7 @@
     "builds": [
       {
         "src": "api/index.php",
-        "use": "@vercel/php"
+        "use": "vercel-php@0.3.6"
       }
     ],
     "routes": [
@@ -15,7 +15,7 @@
     "env": {
       "APP_ENV": "production",
       "APP_DEBUG": "true",
-      "APP_URL": "",
+      "APP_URL": "https://subscribe/v1/api/",
 
       "APP_CONFIG_CACHE": "/tmp/config.php",
       "APP_EVENTS_CACHE": "/tmp/events.php",

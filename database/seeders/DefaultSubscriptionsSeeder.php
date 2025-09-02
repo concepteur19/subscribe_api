@@ -69,23 +69,47 @@ class DefaultSubscriptionsSeeder extends Seeder
      * @param string $logoPath
      * @return string|null
      */
+    // private function copyLogo(string $logoPath): ?string
+    // {
+    //     $relativePath = asset($logoPath);
+
+    //     // Récupérer le contenu du fichier de logo
+    //     $fileContent = file_get_contents(asset($relativePath));
+
+    //     if ($fileContent) {
+    //         // permet de générer un nom de fichier unique pour le logo
+    //         $fileName = uniqid('logo_') . '.png';
+
+    //         // permet d'enregistrer le fichier de logo dans le stockage
+    //         Storage::disk('public')->put('logos/' . $fileName, $fileContent);
+
+    //         return 'logos/' . $fileName;
+    //     }
+
+    //     return null;
+    // }
+
     private function copyLogo(string $logoPath): ?string
-    {
-        $relativePath = asset($logoPath);
+{
+    // On suppose que $logoPath est du type '/storage/logos/Netflix.png'
+    $relativePath = str_replace('/storage/', '', $logoPath); // "logos/Netflix.png"
+    $fullPath = public_path('storage/' . $relativePath);
 
-        // Récupérer le contenu du fichier de logo
-        $fileContent = file_get_contents(asset($relativePath));
+    if (file_exists($fullPath)) {
+        // lire le contenu
+        $fileContent = file_get_contents($fullPath);
 
-        if ($fileContent) {
-            // permet de générer un nom de fichier unique pour le logo
-            $fileName = uniqid('logo_') . '.png';
+        // générer un nom unique
+        $fileName = uniqid('logo_') . '.png';
 
-            // permet d'enregistrer le fichier de logo dans le stockage
-            Storage::disk('public')->put('logos/' . $fileName, $fileContent);
+        // enregistrer dans le disque 'public'
+        Storage::disk('public')->put('logos/' . $fileName, $fileContent);
 
-            return 'logos/' . $fileName;
-        }
-
-        return null;
+        // retourne le chemin relatif enregistré en BD
+        return 'logos/' . $fileName;
     }
+
+    return null;
+}
+
 }
